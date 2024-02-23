@@ -128,14 +128,10 @@ This command loads the `hello_counter.o` program and attaches it to desired netw
 
 ---
 
-# eBPF reading a eBPF map with Python
+#### eBPF reading a eBPF map with Python
 
-```python
- b = BPF(text = """
-
+```c
     BPF_HASH(start, u32, u64);
-
-
     TRACEPOINT_PROBE(raw_syscalls, sys_exit)
     {
         u32 syscall_id = args->id;
@@ -148,12 +144,15 @@ This command loads the `hello_counter.o` program and attaches it to desired netw
             val = start.lookup(&key); //find value associated with key 1
             if (val)
                 bpf_trace_printk("Hello world, I have value %d!\\n", *val);
-
         }
         return 0;
     }
-    """)
+```  
 
+---
+
+
+```python
     thisStart = b["start"]
     thisStart[c_int(1)] = c_int(9) #insert key-value part 1->9
 
@@ -166,9 +165,6 @@ This command loads the `hello_counter.o` program and attaches it to desired netw
             exit()
         print("%-18.9f %-16s %-6d %s" % (ts, task, pid, msg))
 ```
-
-
-- 
 
 ---
 
