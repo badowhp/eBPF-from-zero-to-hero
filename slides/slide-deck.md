@@ -56,6 +56,7 @@ Karriere.at
 - Liz's book is freely shared by Isovalent: [Learning eBPF](https://cilium.isovalent.com/hubfs/Learning-eBPF%20-%20Full%20book.pdf)
 - Install necessary tools: `` `pacman -S bcc bcc-tools python-bcc` ``
 - Explore `bcc` and `clang`
+- [bcc-tools](https://github.com/iovisor/bcc)
 - Dive into `XDP`
 - Try out the `cursor.sh` example (with Liz's load balancer)
 
@@ -107,18 +108,18 @@ Using `clang` and `llvm` to compile the eBPF program into an ELF object file.
 
 ---
 
-The output `counter.o` is an ELF object file containing the compiled eBPF program. This file can be loaded into the Linux kernel using eBPF tools like `bpf` command-line tool or libraries like `BCC` or `libbpf`.
+The output `hello_counter.o` is an ELF object file containing the compiled eBPF program. This file can be loaded into the Linux kernel using eBPF tools like `bpf` command-line tool or libraries like `BCC` or `libbpf`.
 
 ```bash
-sudo bpf load hello_kprobe.o /sys/kernel/debug/tracing/events/syscalls/sys_enter_clone/id
+add code
 ```
 
-This command loads the `hello_kprobe.o` program and attaches it to the `sys_clone` system call.
+This command loads the `hello_counter.o` program and attaches it to desired network interface.
 
 
 ---
 
-# Attaching eBPF XDP program to networkf interface
+# Attaching eBPF XDP program to network interface
 
 - bpftools prog load
 - bpftools prog show
@@ -130,6 +131,40 @@ This command loads the `hello_kprobe.o` program and attaches it to the `sys_clon
 # eBPF reading a eBPF map with Python
 
 ```python
+ b = BPF(text = """
+
+    BPF_HASH(start, u32, u64);
+
+
+    TRACEPOINT_PROBE(raw_syscalls, sys_exit)
+    {
+        u32 syscall_id = args->id;
+        u32 key = 1;
+        u64 *val;
+        u32 uid = bpf_get_current_uid_gid();
+
+        if (uid == 0)
+        {
+            val = start.lookup(&key); //find value associated with key 1
+            if (val)
+                bpf_trace_printk("Hello world, I have value %d!\\n", *val);
+
+        }
+        return 0;
+    }
+    """)
+
+    thisStart = b["start"]
+    thisStart[c_int(1)] = c_int(9) #insert key-value part 1->9
+
+
+    while 1:
+        try:
+            (task, pid, cpu, flags, ts, msg) = b.trace_fields()
+        except KeyboardInterrupt:
+            print("Detaching")
+            exit()
+        print("%-18.9f %-16s %-6d %s" % (ts, task, pid, msg))
 ```
 
 
