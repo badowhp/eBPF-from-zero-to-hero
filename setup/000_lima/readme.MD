@@ -1,0 +1,1 @@
+limactl start --name ubuntu setup.yaml

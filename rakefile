@@ -1,0 +1,14 @@
+desc "Server mode (Pass directory to serve)"
+task :server do
+  sh "npx @marp-team/marp-cli@latest -s ./slides"
+end
+
+desc "Start Lima Ubuntu"
+task :lima do
+  sh "limactl start --name ubuntu setup.yaml"
+end
+
+
+# Default task
+task :default => [:server]
+
