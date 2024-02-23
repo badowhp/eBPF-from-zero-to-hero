@@ -99,11 +99,7 @@ b.trace_print()
 
 Using `clang` and `llvm` to compile the eBPF program into an ELF object file.
 ```bash
-	clang \
-	    -target bpf \
-		-I/usr/include/$(shell uname -m)-linux-gnu \
-		-g \
-	    -O2 -o $@ -c $<
+clang -target bpf -l/usr/include/$(shell uname -m)-linux-gnu -g -O2 -o hello_counter.o -c hello_counter.c
 ```
 
 ---
@@ -121,10 +117,11 @@ This command loads the `hello_counter.o` program and attaches it to desired netw
 
 # Attaching eBPF XDP program to network interface
 
-- bpftools prog load
-- bpftools prog show
-- bpftools attach
-- bpftools show trace
+- bpftool prog load hello.bpf.o /sys/fs/bpf/hello
+- bpftools prog list
+- bpftool prog show id `x` --pretty
+- bpftool net attach xdp id `x` dev `network adapter`
+- bpftool prog tracelog
 
 ---
 
