@@ -106,12 +106,6 @@ clang -target bpf -l/usr/include/$(shell uname -m)-linux-gnu -g -O2 -o hello_cou
 
 The output `hello_counter.o` is an ELF object file containing the compiled eBPF program. This file can be loaded into the Linux kernel using eBPF tools like `bpf` command-line tool or libraries like `BCC` or `libbpf`.
 
-```bash
-add code
-```
-
-This command loads the `hello_counter.o` program and attaches it to desired network interface.
-
 
 ---
 
