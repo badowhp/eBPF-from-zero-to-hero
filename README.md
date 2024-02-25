@@ -11,14 +11,8 @@ Whether you're a DevOps enthusiast or a curious beginner, this meetup promises t
    cd from-zero-to-hero
    ```
 
-2. Install dependencies if needed:
 
-   ```bash
-   package manager: npm rake
-   npm: marp 
-   ```
-
-3. Run rake server command to get served presentation on localhost:8080:
+2. Run rake default command to get presentation served on localhost:8080:
 
    ```bash
    rake server
