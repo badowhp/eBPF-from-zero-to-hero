@@ -14,7 +14,6 @@ Hipolit Badowski
 Karriere.at  
 27.02.24
 
-
 ---
 
 # Introduction
@@ -28,14 +27,11 @@ Karriere.at
 
 ---
 
-![bg](https://path_to_your_section_divider_image_or_use_a_simple_line.png)
-
 # My eBPF Journey
 
 - My personal journey into eBPF:
   - Cilium
   - Observability and Network Policies including the tools (e.g., Hubble) sparked my interest
-
 
 ---
 
@@ -54,11 +50,11 @@ Karriere.at
 # How to Start Your eBPF Journey
 
 - Liz's book is freely shared by Isovalent: [Learning eBPF](https://cilium.isovalent.com/hubfs/Learning-eBPF%20-%20Full%20book.pdf)
-- Install necessary tools: `` `pacman -S bcc bcc-tools python-bcc` ``
+- Install necessary tools: `pacman -S bcc bcc-tools python-bcc`
 - Explore `bcc` and `clang`
 - [bcc-tools](https://github.com/iovisor/bcc)
 - Dive into `XDP`
-- Try out the `cursor.sh` example (with Liz's load balancer)
+- Try out [Liz's Loadbalancer](https://github.com/lizrice/lb-from-scratch) - you can use cursor.sh for documentation parsing
 
 ---
 # Getting Started with eBPF and Python
@@ -69,21 +65,24 @@ To begin exploring eBPF, let's start with a simple Python script using the BCC l
 
 ---
 
+## Demo
+
 ```python
 #!/usr/bin/python
-from bcc import BPF
-
+from bcc import BPF                            # import BPF moduel from bcc
+          
+                                               # actual c code which will be loaded into Kernel
 program = r"""
-int hello(void *ctx) {
+int hello(void *ctx) {                          
     bpf_trace_printk("Hello World!");
     return 0;
 }
 """
 
 b = BPF(text=program)
-syscall = b.get_syscall_fnname("execve")
-b.attach_kprobe(event=syscall, fn_name="hello")
-b.trace_print()
+syscall = b.get_syscall_fnname("execve")        # defining which systemcall will be used
+b.attach_kprobe(event=syscall, fn_name="hello") # attach our c code to syscall
+b.trace_print()                                 # trace_print function prints output
 ```
 
 ---
@@ -104,7 +103,7 @@ clang -target bpf -l/usr/include/$(shell uname -m)-linux-gnu -g -O2 -o hello_cou
 
 ---
 
-The output `hello_counter.o` is an ELF object file containing the compiled eBPF program. This file can be loaded into the Linux kernel using eBPF tools like `bpf` command-line tool or libraries like `BCC` or `libbpf`.
+The output `hello_counter.o` is an ELF object file containing the compiled eBPF program. This file can be loaded into the Linux kernel using eBPF tools like `bpftool` command-line tool or libraries like `BCC` or `libbpf`.
 
 
 ---
