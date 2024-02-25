@@ -15,7 +15,7 @@ Whether you're a DevOps enthusiast or a curious beginner, this meetup promises t
 2. Run rake default command to get presentation served on localhost:8080:
 
    ```bash
-   rake server
+   rake
    ```
 
 
