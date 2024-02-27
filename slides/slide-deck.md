@@ -121,40 +121,39 @@ The output `hello_counter.o` is an ELF object file containing the compiled eBPF 
 #### eBPF reading a eBPF map with Python
 
 ```c
-    BPF_HASH(start, u32, u64);
-    TRACEPOINT_PROBE(raw_syscalls, sys_exit)
-    {
-        u32 syscall_id = args->id;
-        u32 key = 1;
-        u64 *val;
-        u32 uid = bpf_get_current_uid_gid();
+BPF_HASH(counter_table);                         // initialize MAP
 
-        if (uid == 0)
-        {
-            val = start.lookup(&key); //find value associated with key 1
-            if (val)
-                bpf_trace_printk("Hello world, I have value %d!\\n", *val);
-        }
-        return 0;
-    }
+int hello(void *ctx) { 
+u64 uid;
+u64 counter = 0;
+u64 *p;
+uid = bpf_get_current_uid_gid() & 0xFFFFFFFF; 
+p = counter_table.lookup(&uid);
+
+if (p != 0) {
+         counter = *p;
+      }
+
+counter++;
+counter_table.update(&uid, &counter); 
+return 0;  // key value pair
+}
 ```  
 
 ---
 
 
 ```python
-    thisStart = b["start"]
-    thisStart[c_int(1)] = c_int(9) #insert key-value part 1->9
-
-
-    while 1:
-        try:
-            (task, pid, cpu, flags, ts, msg) = b.trace_fields()
-        except KeyboardInterrupt:
-            print("Detaching")
-            exit()
-        print("%-18.9f %-16s %-6d %s" % (ts, task, pid, msg))
+while True:                                  # read the map 
+  sleep(2)
+  s = ""
+  for k,v in b["counter_table"].items():
+     s += f"ID {k.value}: {v.value}\t"       # print assigned key values
+  print(s)
 ```
+
+This part of the code loops indefinitely, looking for output to display every two seconds.
+BCC automatically creates a Python object to represent the hash table. This code loops through any values and prints them to the screen.
 
 ---
 
