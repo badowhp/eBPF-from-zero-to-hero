@@ -136,7 +136,7 @@ if (p != 0) {
 
 counter++;
 counter_table.update(&uid, &counter); 
-return 0;  // key value pair
+return 0;
 }
 ```  
 
